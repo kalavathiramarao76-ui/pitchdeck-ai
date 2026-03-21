@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import ApiErrorFallback from "@/components/ApiErrorFallback";
 
 export default function DeckGenerator() {
   const [form, setForm] = useState({
@@ -14,12 +15,14 @@ export default function DeckGenerator() {
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const [mode, setMode] = useState<"deck" | "competition" | "financials">("deck");
 
   const generate = async () => {
     if (mode === "deck" && (!form.name || !form.problem || !form.solution)) return;
     setLoading(true);
     setResult("");
+    setApiError("");
     try {
       let prompt = "";
       const type = mode;
@@ -42,7 +45,7 @@ export default function DeckGenerator() {
       setResult(data.result);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";
-      setResult("Error: " + msg);
+      setApiError(msg);
     } finally {
       setLoading(false);
     }
@@ -191,6 +194,12 @@ export default function DeckGenerator() {
             {[...Array(5)].map((_, i) => (
               <div key={i} className="shimmer h-4 rounded-full" style={{ width: `${85 - i * 10}%` }} />
             ))}
+          </div>
+        )}
+
+        {apiError && !loading && (
+          <div className="mt-10">
+            <ApiErrorFallback error={apiError} onRetry={generate} />
           </div>
         )}
 

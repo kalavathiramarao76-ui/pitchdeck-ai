@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import OnboardingTour from "@/components/OnboardingTour";
 
 const tools = [
   {
@@ -45,6 +46,7 @@ const tools = [
 export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] noise">
+      <OnboardingTour />
       {/* Nav */}
       <nav className="border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
