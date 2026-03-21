@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 export default function InvestorEmail() {
   const [form, setForm] = useState({
@@ -154,12 +156,16 @@ export default function InvestorEmail() {
           <div className="mt-10">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Your Investor Email</h2>
-              <button
-                onClick={() => navigator.clipboard.writeText(result)}
-                className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                Copy to clipboard
-              </button>
+              <div className="flex items-center gap-2">
+                <FavoriteButton itemId="pitchdeck-email" itemLabel="Investor Email" size="sm" />
+                <ExportMenu content={result} title="Investor Email" />
+                <button
+                  onClick={() => navigator.clipboard.writeText(result)}
+                  className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  Copy to clipboard
+                </button>
+              </div>
             </div>
             <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6 sm:p-8">
               <div className="font-mono text-sm">

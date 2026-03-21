@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import ApiErrorFallback from "@/components/ApiErrorFallback";
+import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 export default function DeckGenerator() {
   const [form, setForm] = useState({
@@ -207,12 +209,16 @@ export default function DeckGenerator() {
           <div className="mt-10">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Generated Content</h2>
-              <button
-                onClick={() => navigator.clipboard.writeText(result)}
-                className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                Copy to clipboard
-              </button>
+              <div className="flex items-center gap-2">
+                <FavoriteButton itemId={`pitchdeck-${mode}`} itemLabel={current.title} size="sm" />
+                <ExportMenu content={result} title={current.title} />
+                <button
+                  onClick={() => navigator.clipboard.writeText(result)}
+                  className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  Copy to clipboard
+                </button>
+              </div>
             </div>
             <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6 sm:p-8">
               <div className="prose prose-invert prose-amber max-w-none">

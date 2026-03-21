@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 const slideTypes = [
   "Title / Hook",
@@ -146,12 +148,16 @@ export default function SlideWriter() {
               <h2 className="text-xl font-semibold">
                 <span className="text-amber-400">{slideType}</span> Slide
               </h2>
-              <button
-                onClick={() => navigator.clipboard.writeText(result)}
-                className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                Copy to clipboard
-              </button>
+              <div className="flex items-center gap-2">
+                <FavoriteButton itemId={`pitchdeck-slide-${slideType}`} itemLabel={`${slideType} Slide`} size="sm" />
+                <ExportMenu content={result} title={`${slideType} Slide`} />
+                <button
+                  onClick={() => navigator.clipboard.writeText(result)}
+                  className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                >
+                  Copy to clipboard
+                </button>
+              </div>
             </div>
             <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-6 sm:p-8">
               <div className="prose prose-invert prose-amber max-w-none">
