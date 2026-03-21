@@ -25,7 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("pitchdeck-theme")||"dark";var r=t==="system"?window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",r);if(r==="light"){document.documentElement.style.setProperty("--pd-bg","#f8f8f8");document.documentElement.style.setProperty("--pd-text","#0a0a0a");document.documentElement.style.setProperty("--pd-bg-card","#ffffff");document.documentElement.style.setProperty("--pd-border","rgba(0,0,0,0.1)");document.documentElement.style.setProperty("--pd-surface","rgba(0,0,0,0.03)");document.documentElement.style.setProperty("--pd-text-secondary","#525252");document.documentElement.style.setProperty("--pd-text-muted","#737373");document.documentElement.style.setProperty("--pd-bg-hover","#f0f0f0")}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-white`}
       >

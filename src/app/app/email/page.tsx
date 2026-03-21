@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function InvestorEmail() {
   const [form, setForm] = useState({
@@ -48,9 +49,12 @@ export default function InvestorEmail() {
             </div>
             <span className="font-semibold text-lg tracking-tight">PitchDeck AI</span>
           </Link>
-          <Link href="/app" className="text-sm text-neutral-400 hover:text-white transition-colors">
-            Back to Dashboard
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/app" className="text-sm text-neutral-400 hover:text-white transition-colors">
+              Back to Dashboard
+            </Link>
+          </div>
         </div>
       </nav>
 
