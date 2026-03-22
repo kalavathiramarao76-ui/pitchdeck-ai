@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { incrementUsage } from "@/lib/usage";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import ApiErrorFallback from "@/components/ApiErrorFallback";
@@ -47,6 +48,7 @@ export default function DeckGenerator() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
+      incrementUsage();
       addToast({ title: `${current.title} generated`, variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";

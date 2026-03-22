@@ -3,6 +3,7 @@
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import OnboardingTour from "@/components/OnboardingTour";
+import { UserMenu } from "@/components/AuthGate";
 
 const tools = [
   {
@@ -64,6 +65,7 @@ export default function Dashboard() {
               Settings
             </Link>
             <ThemeToggle />
+            <UserMenu />
             <Link
               href="/"
               className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors"
