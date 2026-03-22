@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 const features = [
   {
@@ -57,7 +60,108 @@ const features = [
   },
 ];
 
+/* ─── Letter Reveal ─── */
+function LetterReveal({ text, className = "", delay = 0 }: {
+  text: string; className?: string; delay?: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setVisible(true); return; }
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setVisible(true); obs.disconnect(); }
+    }, { threshold: 0.2 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <span ref={ref} className={className} aria-label={text}>
+      {text.split("").map((ch, i) => (
+        <span
+          key={i}
+          className="inline-block transition-all duration-700"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(18px)",
+            transitionDelay: visible ? `${delay + i * 32}ms` : "0ms",
+          }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ─── Scroll Counter ─── */
+function ScrollCounter({ value, suffix = "" }: { value: string; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [display, setDisplay] = useState(value);
+  const num = parseInt(value.replace(/\D/g, ""), 10);
+  const prefix = value.match(/^[<>]*/)?.[0] || "";
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || isNaN(num)) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setDisplay("0");
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        obs.disconnect();
+        const start = performance.now();
+        const dur = 900;
+        const tick = (now: number) => {
+          const t = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          setDisplay(prefix + Math.round(eased * num));
+          if (t < 1) requestAnimationFrame(tick); else setDisplay(value);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [num, value, prefix]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
+}
+
+/* ─── Fade In Observer Hook ─── */
+function useFadeIn() {
+  const refs = useRef<(HTMLElement | null)[]>([]);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      refs.current.forEach(el => { if (el) { el.style.opacity = "1"; el.style.transform = "none"; } });
+      return;
+    }
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          (e.target as HTMLElement).style.opacity = "1";
+          (e.target as HTMLElement).style.transform = "translateY(0) rotateY(0deg)";
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+    refs.current.forEach(el => { if (el) obs.observe(el); });
+    return () => obs.disconnect();
+  }, []);
+
+  const addRef = (el: HTMLElement | null) => {
+    if (el && !refs.current.includes(el)) refs.current.push(el);
+  };
+
+  return addRef;
+}
+
 export default function LandingPage() {
+  const addFlipRef = useFadeIn();
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] noise">
       {/* Nav */}
@@ -85,10 +189,10 @@ export default function LandingPage() {
             AI-powered pitch generation
           </div>
           <h1 className="text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-8">
-            Pitch with
+            <LetterReveal text="Pitch with" />
             <br />
             <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 bg-clip-text text-transparent">
-              confidence.
+              <LetterReveal text="confidence." delay={350} />
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -115,17 +219,22 @@ export default function LandingPage() {
       {/* Stats bar */}
       <section className="border-y border-white/5 py-12">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 px-6 text-center">
-          {[
-            ["10", "Slide Deck"],
-            ["30s", "Elevator Pitch"],
-            ["<60s", "Generation Time"],
-            ["6", "AI Tools"],
-          ].map(([num, label]) => (
-            <div key={label}>
-              <div className="text-3xl sm:text-4xl font-bold text-amber-400">{num}</div>
-              <div className="text-sm text-neutral-500 mt-1">{label}</div>
-            </div>
-          ))}
+          <div>
+            <div className="text-3xl sm:text-4xl font-bold text-amber-400"><ScrollCounter value="10" /></div>
+            <div className="text-sm text-neutral-500 mt-1">Slide Deck</div>
+          </div>
+          <div>
+            <div className="text-3xl sm:text-4xl font-bold text-amber-400"><ScrollCounter value="30" suffix="s" /></div>
+            <div className="text-sm text-neutral-500 mt-1">Elevator Pitch</div>
+          </div>
+          <div>
+            <div className="text-3xl sm:text-4xl font-bold text-amber-400"><ScrollCounter value="<60" suffix="s" /></div>
+            <div className="text-sm text-neutral-500 mt-1">Generation Time</div>
+          </div>
+          <div>
+            <div className="text-3xl sm:text-4xl font-bold text-amber-400"><ScrollCounter value="6" /></div>
+            <div className="text-sm text-neutral-500 mt-1">AI Tools</div>
+          </div>
         </div>
       </section>
 
@@ -141,11 +250,19 @@ export default function LandingPage() {
               Six AI-powered tools. One platform. Zero generic templates.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ perspective: "900px" }}>
+            {features.map((f, idx) => (
               <div
                 key={f.title}
-                className="group p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-amber-500/20 transition-all duration-300"
+                ref={addFlipRef}
+                className="group p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] hover:border-amber-500/20 transition-all duration-700"
+                style={{
+                  opacity: 0,
+                  transform: "translateY(24px) rotateY(-12deg)",
+                  transitionDelay: `${idx * 80}ms`,
+                  transformOrigin: "left center",
+                  willChange: "transform, opacity",
+                }}
               >
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
                   {f.icon}
@@ -203,9 +320,9 @@ export default function LandingPage() {
       <section className="py-32 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6">
-            Stop tweaking slides.
+            <LetterReveal text="Stop tweaking slides." />
             <br />
-            <span className="text-amber-400">Start raising capital.</span>
+            <span className="text-amber-400"><LetterReveal text="Start raising capital." delay={640} /></span>
           </h2>
           <p className="text-neutral-400 text-lg mb-10">
             Every minute spent on formatting is a minute not spent on building.
