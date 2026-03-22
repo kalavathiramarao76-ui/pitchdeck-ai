@@ -64,7 +64,7 @@ export default function InvestorEmail() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div role="main" className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
           Investor Email Writer
         </h1>
@@ -142,6 +142,7 @@ export default function InvestorEmail() {
           <button
             onClick={generate}
             disabled={loading || !form.startup || !form.oneLiner}
+            aria-label={loading ? "Generating email" : "Generate investor email"}
             className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-semibold py-3.5 rounded-xl text-base transition-colors"
           >
             {loading ? "Crafting email..." : "Generate Investor Email"}

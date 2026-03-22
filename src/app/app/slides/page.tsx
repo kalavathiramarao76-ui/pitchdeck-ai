@@ -73,7 +73,7 @@ export default function SlideWriter() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div role="main" className="max-w-4xl mx-auto px-6 py-12">
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
           Slide Writer
         </h1>
@@ -132,6 +132,7 @@ export default function SlideWriter() {
           <button
             onClick={generate}
             disabled={loading || !startup}
+            aria-label={loading ? "Writing slide" : `Write ${slideType} slide`}
             className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-semibold py-3.5 rounded-xl text-base transition-colors"
           >
             {loading ? "Writing slide..." : `Write "${slideType}" Slide`}

@@ -99,7 +99,7 @@ export default function DeckGenerator() {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div role="main" className="max-w-4xl mx-auto px-6 py-12">
         {/* Mode switcher */}
         <div className="flex gap-2 mb-8">
           {(["deck", "competition", "financials"] as const).map((m) => (
@@ -189,6 +189,7 @@ export default function DeckGenerator() {
           <button
             onClick={generate}
             disabled={loading || (!form.name && !form.problem)}
+            aria-label={loading ? "Generating content" : `Generate ${current.title}`}
             className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed text-black font-semibold py-3.5 rounded-xl text-base transition-colors"
           >
             {loading ? "Generating..." : `Generate ${current.title}`}
@@ -221,6 +222,7 @@ export default function DeckGenerator() {
                     navigator.clipboard.writeText(result);
                     addToast({ title: "Copied to clipboard", variant: "info" });
                   }}
+                  aria-label="Copy generated content to clipboard"
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Copy to clipboard

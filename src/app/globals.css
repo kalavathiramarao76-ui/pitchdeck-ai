@@ -78,6 +78,17 @@ textarea {
   box-shadow: 0 8px 32px rgba(245, 158, 11, 0.08);
 }
 
+/* Focus-visible outline for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--gold, #f59e0b);
+  outline-offset: 2px;
+}
+textarea:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--gold, #f59e0b);
+  outline-offset: 0px;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
