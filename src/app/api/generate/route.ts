@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { aiGenerate } from "@/lib/ai";
+import { checkAndIncrementUsage, isAuthenticated } from "@/lib/rate-limit";
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   deck: `You are a world-class pitch deck strategist who has helped raise over $2B in venture funding. Generate a 10-slide pitch deck outline. For each slide, provide:
@@ -59,6 +60,27 @@ Present numbers in a clear format. Be realistic but show strong growth trajector
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+
+    const authed = await isAuthenticated(ip);
+
+    if (!authed) {
+      const { allowed, count } = await checkAndIncrementUsage(ip);
+      if (!allowed) {
+        return NextResponse.json(
+          {
+            error: "FREE_LIMIT_REACHED",
+            message: `Free trial complete. You've used ${count} of 3 free generations. Sign in with Google to continue.`,
+            count,
+            remaining: 0,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     const body = await req.json();
     const { type, prompt } = body;
 

@@ -31,6 +31,13 @@ export default function ElevatorPitch() {
           prompt: `Startup: ${form.startup}\nProblem: ${form.problem}\nSolution: ${form.solution || "Not specified"}\nTraction/Proof Point: ${form.traction || "Early stage"}\n\nGenerate both 30-second and 60-second elevator pitches.`,
         }),
       });
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);

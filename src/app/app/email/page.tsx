@@ -32,6 +32,13 @@ export default function InvestorEmail() {
           prompt: `Startup: ${form.startup}\nOne-liner: ${form.oneLiner}\nTraction/Metrics: ${form.traction || "Early stage"}\nRaising: ${form.raising || "Not specified"}\nInvestor Type: ${form.investorType || "VC partner"}\n\nWrite a cold investor outreach email.`,
         }),
       });
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);

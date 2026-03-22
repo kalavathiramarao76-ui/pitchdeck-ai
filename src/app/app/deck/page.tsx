@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { incrementUsage } from "@/lib/usage";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import ApiErrorFallback from "@/components/ApiErrorFallback";
@@ -45,10 +44,16 @@ export default function DeckGenerator() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type, prompt }),
       });
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
-      incrementUsage();
       addToast({ title: `${current.title} generated`, variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";

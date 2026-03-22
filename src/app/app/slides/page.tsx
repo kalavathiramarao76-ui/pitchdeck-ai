@@ -41,6 +41,13 @@ export default function SlideWriter() {
           prompt: `Startup: ${startup}\nSlide Type: ${slideType}\nAdditional Context: ${context || "None provided"}\n\nWrite compelling, investor-ready copy for this ${slideType} slide.`,
         }),
       });
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
