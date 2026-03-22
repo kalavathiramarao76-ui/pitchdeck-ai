@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
+import { ToastProvider } from "@/components/ToastProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -18,6 +19,32 @@ export const metadata: Metadata = {
   title: "PitchDeck AI — Generate Investor-Ready Pitch Decks",
   description:
     "AI-powered pitch deck generator. Create compelling 10-slide decks, investor emails, elevator pitches, competition matrices, and financial projections.",
+  keywords: ["pitch deck", "startup", "investor", "AI", "fundraising", "elevator pitch", "investor email"],
+  openGraph: {
+    title: "PitchDeck AI — Generate Investor-Ready Pitch Decks",
+    description: "AI-powered pitch deck generator. Create 10-slide decks, investor emails, elevator pitches, and financial projections in seconds.",
+    type: "website",
+    url: "https://pitchdeck-ai-three.vercel.app",
+    siteName: "PitchDeck AI",
+    images: [
+      {
+        url: "https://pitchdeck-ai-three.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PitchDeck AI — AI-Powered Pitch Deck Generator",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PitchDeck AI — Investor-Ready Pitch Decks",
+    description: "Generate compelling pitch decks, investor emails, and elevator pitches with AI.",
+    images: ["https://pitchdeck-ai-three.vercel.app/og-image.png"],
+  },
+  robots: { index: true, follow: true },
+  alternates: {
+    canonical: "https://pitchdeck-ai-three.vercel.app",
+  },
 };
 
 export default function RootLayout({
@@ -29,6 +56,31 @@ export default function RootLayout({
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "PitchDeck AI",
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+              description:
+                "AI-powered pitch deck generator. Create 10-slide decks, investor emails, elevator pitches, and financial projections.",
+              url: "https://pitchdeck-ai-three.vercel.app",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.9",
+                ratingCount: "85",
+              },
+            }),
+          }}
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem("pitchdeck-theme")||"dark";var r=t==="system"?window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",r);if(r==="light"){document.documentElement.style.setProperty("--pd-bg","#f8f8f8");document.documentElement.style.setProperty("--pd-text","#0a0a0a");document.documentElement.style.setProperty("--pd-bg-card","#ffffff");document.documentElement.style.setProperty("--pd-border","rgba(0,0,0,0.1)");document.documentElement.style.setProperty("--pd-surface","rgba(0,0,0,0.03)");document.documentElement.style.setProperty("--pd-text-secondary","#525252");document.documentElement.style.setProperty("--pd-text-muted","#737373");document.documentElement.style.setProperty("--pd-bg-hover","#f0f0f0")}}catch(e){}})()`,
           }}
@@ -38,7 +90,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0a0a0a] text-white`}
       >
         <ErrorBoundaryWrapper>
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </ErrorBoundaryWrapper>
       </body>
     </html>

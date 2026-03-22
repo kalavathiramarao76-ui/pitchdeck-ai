@@ -5,6 +5,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 export default function ElevatorPitch() {
   const [form, setForm] = useState({
@@ -15,6 +16,7 @@ export default function ElevatorPitch() {
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   const generate = async () => {
     if (!form.startup || !form.problem) return;
@@ -32,9 +34,11 @@ export default function ElevatorPitch() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
+      addToast({ title: "Elevator pitches generated", variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";
       setResult("Error: " + msg);
+      addToast({ title: "Generation failed", description: msg, variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -142,7 +146,10 @@ export default function ElevatorPitch() {
                 <FavoriteButton itemId="pitchdeck-pitch" itemLabel="Elevator Pitch" size="sm" />
                 <ExportMenu content={result} title="Elevator Pitch" />
                 <button
-                  onClick={() => navigator.clipboard.writeText(result)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(result);
+                    addToast({ title: "Copied to clipboard", variant: "info" });
+                  }}
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Copy to clipboard

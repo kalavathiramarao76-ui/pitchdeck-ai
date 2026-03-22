@@ -5,6 +5,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 export default function InvestorEmail() {
   const [form, setForm] = useState({
@@ -16,6 +17,7 @@ export default function InvestorEmail() {
   });
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   const generate = async () => {
     if (!form.startup || !form.oneLiner) return;
@@ -33,9 +35,11 @@ export default function InvestorEmail() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
+      addToast({ title: "Investor email created", variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";
       setResult("Error: " + msg);
+      addToast({ title: "Generation failed", description: msg, variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -160,7 +164,10 @@ export default function InvestorEmail() {
                 <FavoriteButton itemId="pitchdeck-email" itemLabel="Investor Email" size="sm" />
                 <ExportMenu content={result} title="Investor Email" />
                 <button
-                  onClick={() => navigator.clipboard.writeText(result)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(result);
+                    addToast({ title: "Copied to clipboard", variant: "info" });
+                  }}
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Copy to clipboard

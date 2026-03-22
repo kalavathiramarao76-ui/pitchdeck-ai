@@ -5,6 +5,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 const slideTypes = [
   "Title / Hook",
@@ -25,6 +26,7 @@ export default function SlideWriter() {
   const [context, setContext] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   const generate = async () => {
     if (!startup) return;
@@ -42,9 +44,11 @@ export default function SlideWriter() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
+      addToast({ title: `"${slideType}" slide written`, variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";
       setResult("Error: " + msg);
+      addToast({ title: "Generation failed", description: msg, variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -152,7 +156,10 @@ export default function SlideWriter() {
                 <FavoriteButton itemId={`pitchdeck-slide-${slideType}`} itemLabel={`${slideType} Slide`} size="sm" />
                 <ExportMenu content={result} title={`${slideType} Slide`} />
                 <button
-                  onClick={() => navigator.clipboard.writeText(result)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(result);
+                    addToast({ title: "Copied to clipboard", variant: "info" });
+                  }}
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Copy to clipboard

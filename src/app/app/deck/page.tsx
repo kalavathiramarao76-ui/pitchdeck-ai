@@ -6,6 +6,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import ApiErrorFallback from "@/components/ApiErrorFallback";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 export default function DeckGenerator() {
   const [form, setForm] = useState({
@@ -19,6 +20,7 @@ export default function DeckGenerator() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const [mode, setMode] = useState<"deck" | "competition" | "financials">("deck");
+  const { addToast } = useToast();
 
   const generate = async () => {
     if (mode === "deck" && (!form.name || !form.problem || !form.solution)) return;
@@ -45,9 +47,11 @@ export default function DeckGenerator() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setResult(data.result);
+      addToast({ title: `${current.title} generated`, variant: "success" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate";
       setApiError(msg);
+      addToast({ title: "Generation failed", description: msg, variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -213,7 +217,10 @@ export default function DeckGenerator() {
                 <FavoriteButton itemId={`pitchdeck-${mode}`} itemLabel={current.title} size="sm" />
                 <ExportMenu content={result} title={current.title} />
                 <button
-                  onClick={() => navigator.clipboard.writeText(result)}
+                  onClick={() => {
+                    navigator.clipboard.writeText(result);
+                    addToast({ title: "Copied to clipboard", variant: "info" });
+                  }}
                   className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
                 >
                   Copy to clipboard
